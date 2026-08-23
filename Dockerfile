@@ -1,6 +1,6 @@
-FROM php:8.2-cli
+FROM php:8.4-cli
 
-# Cài đặt các extension cần thiết cho Laravel & MySQL
+# Cài đặt các thư viện cần thiết cho Laravel & MySQL
 RUN apt-get update -y && apt-get install -y \
     libzip-dev \
     unzip \
@@ -16,16 +16,16 @@ WORKDIR /var/www
 # Copy toàn bộ code vào container
 COPY . .
 
-# Cài đặt dependencies của Laravel
-RUN composer install --no-dev --optimize-autoloader
+# Cài đặt dependencies (bỏ qua check platform cứng nhắc để tránh xung đột version)
+RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs
 
 # Phân quyền cho storage và bootstrap/cache
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-# Mở cổng Render
+# Cấp cổng cho Render
 EXPOSE 8080
 
-# Chạy migrate và khởi chạy server
+# Chạy lệnh cấu hình và khởi chạy ứng dụng
 CMD php artisan config:clear && \
     php artisan route:clear && \
     php artisan view:clear && \
